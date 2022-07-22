@@ -56,23 +56,23 @@ export const constantRoutes = [
   },
 
   {
-    path: '/example',
+    path: '/author',
     component: Layout,
-    redirect: '/example/table',
-    name: 'Example',
-    meta: { title: 'Example', icon: 'el-icon-s-help' },
+    redirect: '/author/list',
+    name: '创作者管理',
+    meta: { title: '创作者管理', icon: 'el-icon-s-help' },
     children: [
       {
-        path: 'table',
-        name: 'Table',
-        component: () => import('@/views/table/index'),
-        meta: { title: 'Table', icon: 'table' }
+        path: 'list',
+        name: '创作者列表',
+        component: () => import('@/views/video/author/list'),
+        meta: { title: '创作者列表', icon: 'table' }
       },
       {
-        path: 'tree',
-        name: 'Tree',
-        component: () => import('@/views/tree/index'),
-        meta: { title: 'Tree', icon: 'tree' }
+        path: 'form',
+        name: '添加创作者',
+        component: () => import('@/views/video/author/form'),
+        meta: { title: '添加创作者', icon: 'form' }
       }
     ]
   },
