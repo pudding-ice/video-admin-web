@@ -55,8 +55,13 @@
       <el-table-column label="排序" prop="sort" min-width="5%" />
       <el-table-column label="操作" min-width="25%" align="center">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" icon="el-icon-edit">修改</el-button>
-          <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteAuthorWithId(scope.row.id)">删除</el-button>
+          <!--修改的跳转  让其跳转到路由当中 编辑路由 页面和添加的是一样， 编辑当中是有参数
+                      在定义一个编辑的路由
+                  -->
+          <router-link :to="'/author/edit/'+scope.row.id">
+            <el-button type="primary" size="mini" icon="el-icon-edit">修改</el-button>
+          </router-link>
+          <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteAuthorWithId(scope.row.id)" >删除</el-button>
         </template>
       </el-table-column>
     </el-table>

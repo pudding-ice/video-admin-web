@@ -73,6 +73,13 @@ export const constantRoutes = [
         name: '添加创作者',
         component: () => import('@/views/video/author/form'),
         meta: { title: '添加创作者', icon: 'form' }
+      },
+      {
+        path: 'edit/:id',
+        name: '编辑',
+        component: () => import('@/views/video/author/form'),
+        meta: { title: '编辑', icon: 'tree' },
+        hidden: true
       }
     ]
   },
