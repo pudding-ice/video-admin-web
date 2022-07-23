@@ -19,7 +19,24 @@
       <el-form-item label="工作经历">
         <el-input v-model="author.career" />
       </el-form-item>
-
+      <el-form-item label="上传头像">
+        <pan-thumb
+          :width="String('100px')"
+          :height="String('100px')"
+          :image="String(author.avatar)"
+        />
+        <el-button type="primary" @click="imageCropperShow=true">上传头像</el-button>
+        <image-cropper
+          v-show="imageCropperShow"
+          :key="cropperKey"
+          :width="500"
+          :height="300"
+          :url="BASE_URL+'/service_upload/file/upload'"
+          field="file"
+          @close="close"
+          @crop-upload-success="cropSuccess"
+        />
+      </el-form-item>
       <el-form-item label="创作者简介">
         <el-input v-model="author.introduction" type="textarea" :rows="10" />
       </el-form-item>
@@ -34,13 +51,20 @@
 
 <script>
 import authorApi from '@/api/video/author'
-import message from 'element-ui'
+import ImageCropper from '@/components/ImageCropper'
+import PanThumb from '@/components/PanThumb'
 export default {
+  components: { ImageCropper, PanThumb },
   data() {
     return {
       author: {
-        sort: 0
-      }
+        sort: 0,
+        level: 0
+      },
+      imageCropperShow: false,
+      cropperKey: 0,
+      BASE_URL: process.env.VUE_APP_BASE_API
+
     }
   },
   created() { // 一进来就要获取参数
@@ -95,6 +119,15 @@ export default {
           this.$message({ type: 'error', message: response.message })
         }
       })
+    },
+    close() {
+      this.imageCropperShow = false
+      this.cropperKey = this.cropperKey + 1
+    },
+    cropSuccess(data) {
+      this.imageCropperShow = false
+      this.author.avatar = data.url
+      this.cropperKey = this.cropperKey + 1
     }
   }
 }
