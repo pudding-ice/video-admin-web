@@ -85,73 +85,46 @@ export const constantRoutes = [
   },
 
   {
-    path: '/form',
+    path: '/category',
     component: Layout,
+    redirect: '/category/list',
     children: [
       {
-        path: 'index',
-        name: 'Form',
-        component: () => import('@/views/form/index'),
-        meta: { title: 'Form', icon: 'form' }
+        path: 'list',
+        name: '视频分类列表',
+        component: () => import('@/views/video/category/list'),
+        meta: { title: '视频分类列表', icon: 'form' }
       }
     ]
   },
 
   {
-    path: '/nested',
+    path: '/data',
     component: Layout,
-    redirect: '/nested/menu1',
-    name: 'Nested',
+    redirect: '/data/index',
+    name: '数据导入导出',
     meta: {
-      title: 'Nested',
+      title: '数据导入导出',
       icon: 'nested'
     },
     children: [
       {
-        path: 'menu1',
-        component: () => import('@/views/nested/menu1/index'), // Parent router-view
-        name: 'Menu1',
-        meta: { title: 'Menu1' },
-        children: [
-          {
-            path: 'menu1-1',
-            component: () => import('@/views/nested/menu1/menu1-1'),
-            name: 'Menu1-1',
-            meta: { title: 'Menu1-1' }
-          },
-          {
-            path: 'menu1-2',
-            component: () => import('@/views/nested/menu1/menu1-2'),
-            name: 'Menu1-2',
-            meta: { title: 'Menu1-2' },
-            children: [
-              {
-                path: 'menu1-2-1',
-                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-1'),
-                name: 'Menu1-2-1',
-                meta: { title: 'Menu1-2-1' }
-              },
-              {
-                path: 'menu1-2-2',
-                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-2'),
-                name: 'Menu1-2-2',
-                meta: { title: 'Menu1-2-2' }
-              }
-            ]
-          },
-          {
-            path: 'menu1-3',
-            component: () => import('@/views/nested/menu1/menu1-3'),
-            name: 'Menu1-3',
-            meta: { title: 'Menu1-3' }
-          }
-        ]
+        path: 'index',
+        component: () => import('@/views/video/data/index-data'), // Parent router-view
+        name: '数据处理首页',
+        meta: { title: '数据处理首页' }
       },
       {
-        path: 'menu2',
-        component: () => import('@/views/nested/menu2/index'),
-        name: 'Menu2',
-        meta: { title: 'menu2' }
+        path: 'category',
+        component: () => import('@/views/video/data/category-data'), // Parent router-view
+        name: '视频分类数据',
+        meta: { title: '视频分类数据' }
+      },
+      {
+        path: 'author',
+        component: () => import('@/views/video/data/author-data'), // Parent router-view
+        name: '视频作者数据',
+        meta: { title: '视频作者数据' }
       }
     ]
   },
