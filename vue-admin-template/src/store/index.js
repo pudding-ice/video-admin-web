@@ -8,6 +8,17 @@ import user from './modules/user'
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
+  state: {
+    contentVO:{}
+  },
+  mutations: {
+    update(state,data){
+      state.contentVO = data
+    }
+  },
+  actions: {
+
+  },
   modules: {
     app,
     settings,

@@ -83,6 +83,43 @@ export const constantRoutes = [
       }
     ]
   },
+  {
+    path: '/content',
+    component: Layout,
+    redirect: '/content/list',
+    name: '视频管理',
+    meta: { title: '视频管理', icon: 'el-icon-s-help' },
+    children: [
+      {
+        path: 'list',
+        name: '视频列表',
+        component: () => import('@/views/video/content/list'),
+        meta: { title: '视频列表', icon: 'table' }
+      },
+      {
+        path: 'add/:id',
+        name: '添加作品',
+        component: () => import('@/views/video/content/add'),
+        meta: { title: '添加作品', icon: 'tree' },
+        // hidden: true
+
+      },
+      {
+        path: 'chapter/:id',
+        name: '章节信息',
+        component: () => import('@/views/video/content/chapter'),
+        meta: { title: '章节信息', icon: 'tree' },
+        hidden: true
+      },
+      {
+        path: 'send/:id',
+        name: '最终发布',
+        component: () => import('@/views/video/content/send'),
+        meta: { title: '最终发布', icon: 'tree' },
+        hidden: true
+      }
+    ]
+  },
 
   {
     path: '/category',
