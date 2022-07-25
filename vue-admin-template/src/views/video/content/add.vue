@@ -41,7 +41,7 @@
       </el-form-item>
       <!--简介-->
       <el-form-item label="作品简介" prop="description">
-        <el-input v-model="contentVO.description" :min="0" autocomplete="off" placeholder="简介"/>
+        <tinymce ref="editor" v-model="contentVO.description"></tinymce>
       </el-form-item>
       <!--封面-->
       <el-form-item label="作品封面" prop="cover">
@@ -126,8 +126,12 @@
 
 <script>
 import contentApi from '@/api/video/content'
+import tinymce from '@/components/Tinymce/tinymce'
 
 export default {
+  components: {
+    tinymce
+  },
   data() {
     var validateTitle = (rule, value, callback) => {
       if (value === undefined || value === null || value === '' || value.trim().length === 0) {
@@ -357,7 +361,7 @@ export default {
     uploadCoverSuccess(response) {
       this.$message({type: 'success', message: response.message})
       this.contentVO.cover = response.data.url
-    }
+    },
   }
 
 }
