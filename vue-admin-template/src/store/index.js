@@ -9,11 +9,19 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
   state: {
-    contentVO:{}
+    contentVO: null,
+    chapterTree: null,
+    preViewObject: null
   },
   mutations: {
-    update(state,data){
+    update(state, data) {
       state.contentVO = data
+    },
+    cacheChapter(state, data) {
+      state.chapterTree = data
+    },
+    cachePreViewObject(state, data) {
+      state.preViewObject = data
     }
   },
   actions: {

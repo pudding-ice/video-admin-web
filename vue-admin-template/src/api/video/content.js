@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+
 export default {
   getCategoryTree() {
     return request({
@@ -10,6 +11,13 @@ export default {
     return request({
       url: `/service_video/author/getAllAuthor`,
       method: 'get'
+    })
+  },
+  sentContentData(contentChapterVO) {
+    return request({
+      url: `/service_video/content/saveContentData`,
+      method: 'post',
+      data: contentChapterVO
     })
   }
 }

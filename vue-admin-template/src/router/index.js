@@ -1,10 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-
-Vue.use(Router)
-
 /* Layout */
 import Layout from '@/layout'
+
+Vue.use(Router)
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -97,25 +96,25 @@ export const constantRoutes = [
         meta: { title: '视频列表', icon: 'table' }
       },
       {
-        path: 'add/:id',
+        path: 'add',
         name: '添加作品',
         component: () => import('@/views/video/content/add'),
-        meta: { title: '添加作品', icon: 'tree' },
+        meta: {title: '添加作品', icon: 'tree'},
         // hidden: true
 
       },
       {
-        path: 'chapter/:id',
+        path: 'chapter',
         name: '章节信息',
         component: () => import('@/views/video/content/chapter'),
-        meta: { title: '章节信息', icon: 'tree' },
+        meta: {title: '章节信息', icon: 'tree'},
         hidden: true
       },
       {
-        path: 'send/:id',
+        path: 'send',
         name: '最终发布',
         component: () => import('@/views/video/content/send'),
-        meta: { title: '最终发布', icon: 'tree' },
+        meta: {title: '最终发布', icon: 'tree'},
         hidden: true
       }
     ]
