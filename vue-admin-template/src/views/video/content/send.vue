@@ -68,7 +68,7 @@ export default {
           chapterTree: this.chapterTree
         }
 
-        contentApi.sentContentData(contentChapterVO).then((res) => {
+        contentApi.sendContentData(contentChapterVO).then((res) => {
           if (res.success) {
             this.$message({type: 'success', message: res.message})
             this.loading = false

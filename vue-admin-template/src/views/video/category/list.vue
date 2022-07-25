@@ -15,7 +15,8 @@
 </template>
 
 <script>
-import cateApi from '@/api/category/category'
+import cateApi from '@/api/video/category'
+
 export default {
 
   data() {

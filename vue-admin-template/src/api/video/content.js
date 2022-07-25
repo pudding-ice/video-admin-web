@@ -13,12 +13,26 @@ export default {
       method: 'get'
     })
   },
-  sentContentData(contentChapterVO) {
+  sendContentData(contentChapterVO) {
     return request({
       url: `/service_video/content/saveContentData`,
       method: 'post',
       data: contentChapterVO
     })
+  },
+  getContentPageList(current, size, searchObj) {
+    return request({
+      url: `/service_video/content/getContentPageQuery/${current}/${size}`,
+      method: 'post',
+      data: searchObj
+    })
+  },
+  deleteContentById(id) {
+    return request({
+      url: `/service_video/content/deleteContent/${id}`,
+      method: 'post'
+    })
   }
+
 }
 
