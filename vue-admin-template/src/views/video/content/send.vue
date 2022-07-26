@@ -40,11 +40,17 @@ export default {
       active: 3,
       previewObject: null,
       contentVO: null,
-      chapterTree: null
+      chapterTree: null,
+      contentId: null
     }
   },
   created() {
     this.getData()
+    // 获取路由当中的id
+    if (this.$route.params && this.$route.params.id) {
+      // 获取当前作品id
+      this.contentId = this.$route.params.id
+    }
   },
   methods: {
     sendContent() {
@@ -67,17 +73,30 @@ export default {
           contentVO: this.contentVO,
           chapterTree: this.chapterTree
         }
-
-        contentApi.sendContentData(contentChapterVO).then((res) => {
-          if (res.success) {
-            this.$message({type: 'success', message: res.message})
-            this.loading = false
-          } else {
-            this.$message({type: 'error', message: res.message})
-            this.loading = false
-            return false
-          }
-        })
+        if (this.contentId !== '-1') {
+          // 不是-1,更新操作
+          contentApi.updateContentData(contentChapterVO).then((res) => {
+            if (res.success) {
+              this.$message({type: 'success', message: res.message})
+              this.loading = false
+            } else {
+              this.$message({type: 'error', message: res.message})
+              this.loading = false
+              return false
+            }
+          })
+        } else {
+          contentApi.sendContentData(contentChapterVO).then((res) => {
+            if (res.success) {
+              this.$message({type: 'success', message: res.message})
+              this.loading = false
+            } else {
+              this.$message({type: 'error', message: res.message})
+              this.loading = false
+              return false
+            }
+          })
+        }
         this.$store.commit('update', null)
         this.$store.commit('cachePreViewObject', null)
         this.$store.commit('cacheChapter', null)
@@ -95,7 +114,7 @@ export default {
       this.previewObject = this.$store.state.preViewObject
     },
     pre() {
-      this.$router.push({path: '/content/chapter'})
+      this.$router.push({path: '/content/chapter/' + this.contentId})
     }
   }
 }

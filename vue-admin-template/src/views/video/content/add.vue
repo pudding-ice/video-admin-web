@@ -41,7 +41,7 @@
       </el-form-item>
       <!--简介-->
       <el-form-item label="作品简介" prop="description">
-        <tinymce ref="editor" v-model="contentVO.description"></tinymce>
+        <tinymce ref="editor" v-model="contentVO.description"/>
       </el-form-item>
       <!--封面-->
       <el-form-item label="作品封面" prop="cover">
@@ -241,7 +241,7 @@ export default {
           {validator: validatePrice, trigger: 'blur'}
         ]
       },
-      contentId: '',
+      contentId: -1,
       localUrl: ''
     }
   },
@@ -257,7 +257,7 @@ export default {
           // 路由跳转
           this.$store.commit('update', this.contentVO)
           this.$store.commit('cachePreViewObject', this.getPreviewObject())
-          this.$router.push({path: '/content/chapter' + this.contentId})
+          this.$router.push({path: '/content/chapter/' + this.contentId})
         } else {
           return false
         }
@@ -305,6 +305,22 @@ export default {
       this.isShowUpload = true
     },
     loadData() {
+      // 获取路由参数
+      if (this.$route.params && this.$route.params.id) {
+        const contentId = this.$route.params.id
+        if (contentId !== undefined && contentId !== '' && contentId !== null && contentId !== '-1') {
+          // 有值,去数据库中查询
+          console.log(contentId)
+          this.getDataWithContentId(contentId)
+        }
+      } else {
+        console.log('清空数据')
+        // 没有值,就先清空vuex中的数据
+        this.$store.commit('update', null)
+        this.$store.commit('cachePreViewObject', null)
+        this.$store.commit('cacheChapter', null)
+        this.$router.push({path: '/content/add'})
+      }
       const vo = this.$store.state.contentVO
       if (vo !== null) {
         this.contentVO = vo
@@ -362,6 +378,21 @@ export default {
       this.$message({type: 'success', message: response.message})
       this.contentVO.cover = response.data.url
     },
+    getDataWithContentId(id) {
+      contentApi.getContentDataWithId(id).then(response => {
+        this.contentId = id
+        const data = response.data.data
+        this.contentVO = data.contentVO
+        // 处理封面
+        this.isShowUpload = false
+        this.isShowImgUpload = true
+        this.localUrl = JSON.parse(JSON.stringify(this.contentVO.cover))
+        this.contentVO.categoryId = [this.contentVO.categoryId, this.contentVO.categoryParentId]
+        console.log(this.contentVO)
+        console.log(data.chapterTree)
+        this.$store.commit('cacheChapter', data.chapterTree)
+      })
+    }
   }
 
 }

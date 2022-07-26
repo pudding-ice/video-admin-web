@@ -30,9 +30,21 @@ export default {
   deleteContentById(id) {
     return request({
       url: `/service_video/content/deleteContent/${id}`,
-      method: 'post'
+      method: 'delete'
+    })
+  },
+  updateContentData(contentChapterVO) {
+    return request({
+      url: `/service_video/content/updateContentData`,
+      method: 'post',
+      data: contentChapterVO
+    })
+  },
+  getContentDataWithId(id) {
+    return request({
+      url: `/service_video/content/getContentDataWithId/${id}`,
+      method: 'get'
     })
   }
-
 }
 

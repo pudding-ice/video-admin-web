@@ -44,7 +44,7 @@
           <img :src="item.cover" alt="scope.row.title" width="100%" height="180px">
           <a href="#" style="font-size: 14px; color: #333">{{ item.title }}</a>
           <p style="margin-top: 0px">
-            <router-link :to="'/content/info/'+item.id">
+            <router-link :to="'/content/add/'+item.id">
               <el-button type="text" size="mini" icon="el-icon-edit">编辑作品信息</el-button>
             </router-link>
             <el-button
@@ -86,7 +86,7 @@ export default {
       list: null, // 数据列表
       total: 0, // 总记录数
       current: 1, // 页码
-      size: 5, // 每页记录数
+      size: 10, // 每页记录数
       contentQuery: {
         categoryId: null,
         title: null,
@@ -125,7 +125,7 @@ export default {
       }).then(() => {
         return contentApi.deleteContentById(id)
       }).then(() => {
-        this.getData()
+        this.getData(1)
         this.$message({
           type: 'success',
           message: '删除成功!'

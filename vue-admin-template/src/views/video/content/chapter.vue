@@ -185,7 +185,7 @@ export default {
       id: 1000,
       active: 2,
       contentVO: {},
-      contentId: '', // 作品ID
+      contentId: null, // 作品ID
       chapterTree: null,
       isShowChapterForm: false,
       chapterFormData: {
