@@ -7,5 +7,11 @@ export default {
       url: `${apiName}/getChapterTreeWithContentId/${contentId}`,
       method: 'GET'
     })
+  },
+  deleteChapterVideoWithChapterId(chapterId) {
+    return request({
+      url: `${apiName}/deleteChapterVideoWithChapterId/${chapterId}`,
+      method: 'delete'
+    })
   }
 }

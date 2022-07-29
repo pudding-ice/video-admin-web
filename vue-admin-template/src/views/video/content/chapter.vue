@@ -61,8 +61,13 @@
         :visible.sync="isShowChapterForm"
         width="30%"
       >
-        <el-form ref="chapterFormData" label-width="100px" :model="chapterFormData" class="demo-ruleForm"
-                 :rules="rules">
+        <el-form
+          ref="chapterFormData"
+          label-width="100px"
+          :model="chapterFormData"
+          class="demo-ruleForm"
+          :rules="rules"
+        >
           <el-form-item
             label="章节名"
             prop="title"
@@ -87,8 +92,13 @@
         :visible.sync="isShowContentVideoForm"
         width="30%"
       >
-        <el-form ref="contentVideoFormData" label-width="100px" :rules="rules" :model="contentVideoFormData"
-                 class="demo-ruleForm">
+        <el-form
+          ref="contentVideoFormData"
+          label-width="100px"
+          :rules="rules"
+          :model="contentVideoFormData"
+          class="demo-ruleForm"
+        >
           <el-form-item
             label="小节名"
             prop="title"
@@ -100,6 +110,33 @@
             prop="sort"
           >
             <el-input v-model.number="contentVideoFormData.sort"/>
+          </el-form-item>
+          <el-form-item
+            label="上传视频"
+            prop="title"
+          >
+            <!-- 上传视频 -->
+            <el-upload
+              :on-success="handleVodUploadSuccess"
+              :on-remove="handleVodRemove"
+              :before-remove="beforeVodRemove"
+              :on-exceed="handleUploadExceed"
+              :file-list="fileList"
+              :action="BASE_API+'/service_vod/vod/upload'"
+              :limit="1"
+              class="upload-demo"
+            >
+              <el-button size="small" type="primary">上传视频</el-button>
+              <el-tooltip placement="right-end">
+                <div slot="content">最大支持1G，<br>
+                  支持3GP、ASF、AVI、DAT、DV、FLV、F4V、<br>
+                  GIF、M2T、M4V、MJ2、MJPEG、MKV、MOV、MP4、<br>
+                  MPE、MPG、MPEG、MTS、OGG、QT、RM、RMVB、<br>
+                  SWF、TS、VOB、WMV、WEBM 等视频格式上传
+                </div>
+                <i class="el-icon-question"/>
+              </el-tooltip>
+            </el-upload>
           </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
@@ -126,6 +163,34 @@
           >
             <el-input v-model.number="editFormData.sort"/>
           </el-form-item>
+          <el-form-item
+            v-show="!editFormData.children"
+            label="上传视频"
+            prop="title"
+          >
+            <!-- 上传视频 -->
+            <el-upload
+              :on-success="handleEditVodUploadSuccess"
+              :on-remove="handleEditVodRemove"
+              :before-remove="beforeVodRemove"
+              :on-exceed="handleUploadExceed"
+              :file-list="fileList"
+              :action="BASE_API+'/service_vod/vod/upload'"
+              :limit="1"
+              class="upload-demo"
+            >
+              <el-button size="small" type="primary">上传视频</el-button>
+              <el-tooltip placement="right-end">
+                <div slot="content">最大支持1G，<br>
+                  支持3GP、ASF、AVI、DAT、DV、FLV、F4V、<br>
+                  GIF、M2T、M4V、MJ2、MJPEG、MKV、MOV、MP4、<br>
+                  MPE、MPG、MPEG、MTS、OGG、QT、RM、RMVB、<br>
+                  SWF、TS、VOB、WMV、WEBM 等视频格式上传
+                </div>
+                <i class="el-icon-question"/>
+              </el-tooltip>
+            </el-upload>
+          </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
           <el-button @click="closeEditForm">取 消</el-button>
@@ -140,6 +205,8 @@
 
 <script>
 import chapter from '@/api/video/chapter'
+import vodApi from '@/api/video/vod'
+import videoApi from '@/api/video/video'
 
 export default {
   data() {
@@ -195,16 +262,22 @@ export default {
       isShowContentVideoForm: false,
       contentVideoFormData: {
         title: '',
-        sort: ''
+        sort: 0,
+        videoSourceId: null,
+        videoOriginalName: null
       },
       isShowEditForm: false,
       editFormData: {
         title: '',
         sort: '',
-        children: []
+        children: [],
+        videoSourceId: null,
+        videoOriginalName: null
       },
       contentVideoNodeData: {},
-      chapterNodeData: {}
+      chapterNodeData: {},
+      fileList: [], // 上传文件列表
+      BASE_API: process.env.VUE_APP_BASE_API
     }
   },
   created() {
@@ -261,7 +334,12 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           const data = this.contentVideoNodeData
-          const newChild = {title: this.contentVideoFormData.title, sort: this.contentVideoFormData.sort}
+          const newChild = {
+            title: this.contentVideoFormData.title,
+            sort: this.contentVideoFormData.sort,
+            videoSourceId: this.contentVideoFormData.videoSourceId,
+            videoOriginalName: this.contentVideoFormData.videoOriginalName
+          }
           data.children.push(newChild)
           console.log(data)
           this.$message({
@@ -276,6 +354,7 @@ export default {
     },
     resetContentVideoForm() {
       this.contentVideoFormData = {}
+      this.fileList = []
     },
     appendContentVideo(data) {
       this.contentVideoNodeData = data
@@ -328,20 +407,134 @@ export default {
       if (data.children != null) {
         // 父结点,有孩子
         this.chapterNodeData = data
-        this.editFormData = JSON.parse(JSON.stringify(data))
+        this.editFormData.children = []
+        this.editFormData = data
       } else {
         this.contentVideoNodeData = data
-        this.editFormData = JSON.parse(JSON.stringify(data))
+        this.editFormData = data
+      }
+      if (data.videoSourceId != null && data.videoSourceId !== undefined && data.videoSourceId !== '') {
+        this.editFormData.videoOriginalName = data.videoOriginalName
+        this.editFormData.videoSourceId = data.videoSourceId
+        this.fileList = [{'name': this.editFormData.videoOriginalName}]
       }
       this.isShowEditForm = true
     },
 
     remove(node, data) {
-      const parent = node.parent
-      const children = parent.data.children || parent.data
-      const index = children.findIndex(d => d.id === data.id)
-      children.splice(index, 1)
+      console.log(data)
+      if (data.children !== undefined) {
+        this.$confirm('删除章节会删除章节下的所有小节视频,是否删除?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          chapter.deleteChapterVideoWithChapterId(data.id).then(response => {
+            if (response.success) {
+              this.$message({type: 'success', message: response.message})
+            } else {
+              this.$message({type: 'warning', message: response.message})
+            }
+          })
+          const parent = node.parent
+          const children = parent.data.children || parent.data
+          const index = children.findIndex(d => d.id === data.id)
+          children.splice(index, 1)
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
+      } else {
+        this.$confirm('是否要删除小节?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          videoApi.deleteVideoWithId(data.videoSourceId).then(response => {
+            if (response.success) {
+              this.$message({type: 'success', message: response.message})
+            } else {
+              this.$message({type: 'warning', message: response.message})
+            }
+          })
+          const parent = node.parent
+          const children = parent.data.children || parent.data
+          const index = children.findIndex(d => d.id === data.id)
+          children.splice(index, 1)
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
+      }
     },
+    // 上传视频方法
+    // 自动上传成功回调
+    handleVodUploadSuccess(response, file, fileList) {
+      // 获取当前上传视频ID
+      this.contentVideoFormData.videoSourceId = response.data.videoId
+      // 获取当前上传视频标题
+      this.contentVideoFormData.videoOriginalName = file.name
+      // 设置文件名回显
+      this.fileList = [{'name': this.contentVideoFormData.videoOriginalName}]
+    },
+    handleEditVodUploadSuccess(response, file, fileList) {
+      // 获取当前上传视频ID
+      this.editFormData.videoSourceId = response.data.videoId
+      // 获取当前上传视频标题
+      this.editFormData.videoOriginalName = file.name
+      // 设置文件名回显
+      this.fileList = [{'name': this.editFormData.videoOriginalName}]
+    },
+    // 已经超过了指定数量时, 调用此方法
+    handleUploadExceed(files, fileList) {
+      this.$message.warning('请先删除已上传的视频')
+    },
+    // 删除之前提示信息
+    beforeVodRemove(file, fileList) {
+      return this.$confirm(`确定删除 ${file.name}？`)
+    },
+    // 删除小节视频
+    handleVodRemove(file, fileList) {
+      vodApi.deleteVodById(this.contentVideoFormData.videoSourceId).then(response => {
+        // 清空当前小节视频id
+        this.contentVideoFormData.videoSourceId = ''
+        // 清空当前小节视频标题
+        this.contentVideoFormData.videoOriginalName = ''
+        this.fileList = []
+        this.$message({
+          type: 'success',
+          message: response.message
+        })
+      })
+    },
+    handleEditVodRemove(file, fileList) {
+      vodApi.deleteVodById(this.editFormData.videoSourceId).then(response => {
+        // 清空当前小节视频id
+        this.editFormData.videoSourceId = ''
+        // 清空当前小节视频标题
+        this.editFormData.videoOriginalName = ''
+        this.fileList = []
+        this.$message({
+          type: 'success',
+          message: response.message
+        })
+      })
+    },
+    // 回显
+    // editorContentVideo(id) {
+    //   this.dialogVideoFormVisible = true
+    //   videoApi.getVideoInfoById(id).then(res => {
+    //     this.contentVideo = res.data.item
+    //     // 如果有视频, 显示视频标题
+    //     if (this.contentVideo.videoOriginalName !== '') {
+    //       this.fileList = [{ 'name': this.contentVideo.videoOriginalName }]
+    //     }
+    //   })
+    // },
 
     pre() {
       this.$router.push({path: '/content/add/' + this.contentId})

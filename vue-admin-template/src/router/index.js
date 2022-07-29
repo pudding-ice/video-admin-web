@@ -170,15 +170,41 @@ export const constantRoutes = [
       }
     ]
   },
-
   {
-    path: 'external-link',
+    path: '/authority',
     component: Layout,
+    redirect: '/authority/user/list',
+    name: '权限管理',
+    meta: {title: '权限管理', icon: 'tree'},
     children: [
       {
-        path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
-        meta: { title: 'External Link', icon: 'link' }
+        path: 'user/list',
+        name: '用户管理',
+        component: () => import('@/views/authority/user/list'),
+        meta: {title: '用户管理'}
+      },
+      {
+        path: 'user/add',
+        name: '用户添加',
+        component: () => import('@/views/authority/user/form'),
+        meta: {title: '用户添加'},
+        hidden: true
+      },
+      {
+        path: 'user/update/:id',
+        name: '用户修改',
+        component: () => import('@/views/authority/user/form'),
+        meta: {title: '用户修改'},
+        hidden: true
+      },
+      {
+        path: 'user/role/:id',
+        name: '用户角色',
+        component: () => import('@/views/authority/user/roleForm'),
+        meta: {title: '用户角色'},
+        hidden: true
       }
+
     ]
   },
 
