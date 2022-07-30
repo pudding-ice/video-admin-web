@@ -45,9 +45,11 @@
           <a href="#" style="font-size: 14px; color: #333">{{ item.title }}</a>
           <p style="margin-top: 0px">
             <router-link :to="'/content/add/'+item.id">
-              <el-button type="text" size="mini" icon="el-icon-edit">编辑作品信息</el-button>
+              <el-button v-if="hasPermission('content.update')" type="text" size="mini" icon="el-icon-edit">编辑作品信息
+              </el-button>
             </router-link>
             <el-button
+              v-if="hasPermission('content.remove')"
               style="margin-left: 10px"
               type="text"
               size="mini"

@@ -10,8 +10,8 @@
     </el-form>
     <!-- 工具条 -->
     <div>
-      <el-button type="danger" size="mini" @click="addUser()">添加</el-button>
-      <el-button type="danger" size="mini" @click="removeRows()">批量删除</el-button>
+      <el-button v-if="hasPermission('user.add')" type="primary" size="mini" @click="addUser()">添加</el-button>
+      <el-button v-if="hasPermission('user.remove')" type="danger" size="mini" @click="removeRows()">批量删除</el-button>
     </div>
     <!--用户列表 -->
     <el-table
@@ -40,14 +40,16 @@
       <el-table-column label="操作" width="250" align="center">
         <template slot-scope="scope">
           <router-link :to="'/authority/user/role/'+scope.row.id">
-            <el-button type="success" size="mini">绑定角色</el-button>
+            <el-button v-if="hasPermission('user.assgin')" type="success" size="mini">绑定角色</el-button>
           </router-link>
           &nbsp;
           <router-link :to="'/authority/user/update/'+scope.row.id">
-            <el-button type="primary" size="mini">修改</el-button>
+            <el-button v-if="hasPermission('user.update')" type="primary" size="mini">修改</el-button>
           </router-link>
           &nbsp;
-          <el-button type="danger" size="mini" @click="removeDataById(scope.row.id)">删除</el-button>
+          <el-button v-if="hasPermission('user.remove')" type="danger" size="mini"
+                     @click="removeDataById(scope.row.id)">删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>

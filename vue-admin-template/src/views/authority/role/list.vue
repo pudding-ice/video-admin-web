@@ -11,8 +11,8 @@
 
     <!-- 工具条 -->
     <div>
-      <el-button type="danger" size="mini" @click="addUser()">添加</el-button>
-      <el-button type="danger" size="mini" @click="removeRows()">批量删除</el-button>
+      <el-button v-if="hasPermission('role.add')" type="primary" size="mini" @click="addUser()">添加</el-button>
+      <el-button v-if="hasPermission('role.remove')" type="danger" size="mini" @click="removeRows()">批量删除</el-button>
     </div>
     <!-- 角色列表 -->
     <el-table
@@ -20,16 +20,19 @@
       :data="list"
       stripe
       style="width: 100%"
-      @selection-change="handleSelectionChange">
+      @selection-change="handleSelectionChange"
+    >
 
       <el-table-column
         type="selection"
-        width="55"/>
+        width="55"
+      />
 
       <el-table-column
         label="序号"
         width="70"
-        align="center">
+        align="center"
+      >
         <template slot-scope="scope">
           {{ (page - 1) * limit + scope.$index + 1 }}
         </template>
@@ -37,16 +40,19 @@
 
       <el-table-column prop="roleName" label="角色名称"/>
 
-
-      <el-table-column label="操作" width="200" align="center">
+      <el-table-column label="操作" width="300" align="center">
         <template slot-scope="scope">
           <router-link :to="'/authority/role/distribution/'+scope.row.id">
-            分配权限
+            <el-button v-if="hasPermission('role.acl')" type="success" size="mini" style="margin-right:5px">分配权限
+            </el-button>
           </router-link>
           <router-link :to="'/authority/role/update/'+scope.row.id">
-            编辑
+            <el-button v-if="hasPermission('role.update')" type="primary" size="mini" style="margin-right:5px">编辑
+            </el-button>
           </router-link>
-          <a @click="removeDataById(scope.row.id)">删除</a>
+          <el-button v-if="hasPermission('role.remove')" type="danger" size="mini" @click="removeDataById(scope.row.id)"
+                     style="margin-right:5px">删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>

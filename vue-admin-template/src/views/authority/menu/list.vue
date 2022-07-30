@@ -233,7 +233,7 @@ export default {
     },
     /** 添加菜单*/
     addMenu() {
-      menu.saveMenu(this.menu).then(response => {
+      menu.saveLevelOne(this.menu).then(response => {
         this.dialogFormVisible = false
         this.$message({
           type: 'success',

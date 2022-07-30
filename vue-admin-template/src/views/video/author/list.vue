@@ -59,10 +59,13 @@
                       在定义一个编辑的路由
                   -->
           <router-link :to="'/author/edit/'+scope.row.id">
-            <el-button type="primary" size="mini" icon="el-icon-edit">修改</el-button>
+            <el-button v-if="hasPermission('author.update')" type="primary" size="mini" icon="el-icon-edit">修改
+            </el-button>
           </router-link>
           &nbsp;
-          <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteAuthorWithId(scope.row.id)" >删除</el-button>
+          <el-button v-if="hasPermission('author.remove')" type="danger" size="mini" icon="el-icon-delete"
+                     @click="deleteAuthorWithId(scope.row.id)">删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>

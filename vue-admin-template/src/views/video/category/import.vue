@@ -24,7 +24,7 @@
         </el-tag>
       </el-form-item>
       <!--上传excel-->
-      <el-form-item label="上传分类数据">
+      <el-form-item v-if="hasPermission('category.import')" label="上传分类数据">
         <el-upload
           ref="upload"
           :action="BASE_URL+'/service_video/category/importExcel'"
@@ -51,6 +51,7 @@
 
 <script>
 import templateApi from '@/api/data/template'
+
 export default {
   name: 'CategoryData',
   data() {

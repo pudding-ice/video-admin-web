@@ -47,5 +47,12 @@ export default {
       method: 'post',
       params: {roleId, menus}
     })
+  },
+  saveMenu(permission) {
+    return request({
+      url: `${api_name}/savePermission`,
+      method: 'post',
+      data: permission
+    })
   }
 }
