@@ -1,16 +1,19 @@
 import router from './router'
 import store from './store'
-import { Message } from 'element-ui'
+import {Message} from 'element-ui'
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
-import { getToken } from '@/utils/auth' // get token from cookie
+import {getToken} from '@/utils/auth' // get token from cookie
 import getPageTitle from '@/utils/get-page-title'
+import Layout from '@/layout'
 
-NProgress.configure({ showSpinner: false }) // NProgress Configuration
+const _import = require('./router/_import_' + process.env.NODE_ENV) // 获取组件的方法
+
+NProgress.configure({showSpinner: false}) // NProgress Configuration
 
 const whiteList = ['/login'] // no redirect whitelist
 
-router.beforeEach(async(to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   // start progress bar
   NProgress.start()
 
@@ -33,12 +36,20 @@ router.beforeEach(async(to, from, next) => {
         try {
           // get user info
           await store.dispatch('user/getInfo')
-
-          next()
+          await store.dispatch('user/getRouter') // 触发获取路由表的接口
+          console.log(store.getters.menus.length)
+          if (store.getters.menus.length < 1) {
+            global.antRouter = []
+            next()
+          }
+          const menus = filterAsyncRouter(store.getters.menus) // 过滤路由
+          router.addRoutes(menus) // 动态添加路由
+          global.antRouter = menus // 将路由数据传递给全局变量，做侧边栏渲染的工作
+          next('/') // 正常走
         } catch (error) {
           // remove token and go to login page to re-login
           await store.dispatch('user/resetToken')
-          Message.error(error || 'Has Error')
+          Message.error(error.message || 'Has Error')
           next(`/login?redirect=${to.path}`)
           NProgress.done()
         }
@@ -62,3 +73,27 @@ router.afterEach(() => {
   // finish progress bar
   NProgress.done()
 })
+
+// 遍历后台传来的路由字符串，转换为组件对象
+function filterAsyncRouter(asyncRouterMap) {
+  console.log(asyncRouterMap)
+  const accessedRouters = asyncRouterMap.filter(route => {
+    if (route.component) {
+      if (route.component === 'Layout') {
+        route.component = Layout
+      } else {
+        try {
+          route.component = _import(route.component) // 导入组件
+        } catch (error) {
+          console.log(error)
+          route.component = _import('dashboard/index') // 导入组件
+        }
+      }
+    }
+    if (route.children && route.children.length) {
+      route.children = filterAsyncRouter(route.children)
+    }
+    return true
+  })
+  return accessedRouters
+}
