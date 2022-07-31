@@ -387,7 +387,7 @@ export default {
         this.isShowUpload = false
         this.isShowImgUpload = true
         this.localUrl = JSON.parse(JSON.stringify(this.contentVO.cover))
-        this.contentVO.categoryId = [this.contentVO.categoryId, this.contentVO.categoryParentId]
+        this.contentVO.categoryId = [this.contentVO.categoryParentId, this.contentVO.categoryId]
         console.log(this.contentVO)
         console.log(data.chapterTree)
         this.$store.commit('cacheChapter', data.chapterTree)

@@ -67,8 +67,8 @@ export default {
           return false
         }
         // 处理categoryId
-        this.contentVO.categoryParentId = this.contentVO.categoryId[1]
-        this.contentVO.categoryId = this.contentVO.categoryId[0]
+        this.contentVO.categoryParentId = this.contentVO.categoryId[0]
+        this.contentVO.categoryId = this.contentVO.categoryId[1]
         const contentChapterVO = {
           contentVO: this.contentVO,
           chapterTree: this.chapterTree
