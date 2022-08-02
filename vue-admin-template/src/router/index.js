@@ -48,8 +48,9 @@ export const constantRoutes = [
 ]
 
 const createRouter = () => new Router({
+  mode: 'hash',
   // mode: 'history', // require service support
-  scrollBehavior: () => ({ y: 0 }),
+  scrollBehavior: () => ({y: 0}),
   routes: constantRoutes
 })
 
