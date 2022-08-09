@@ -45,6 +45,12 @@ export default {
       url: `/service_video/content/getContentDataWithId/${id}`,
       method: 'get'
     })
+  },
+  deleteContentCoverWithName(name) {
+    return request({
+      url: `/service_video/content/deleteContentCoverWithName/${name}`,
+      method: 'get'
+    })
   }
 }
 

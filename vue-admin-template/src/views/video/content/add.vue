@@ -56,6 +56,8 @@
           :on-change="imgSaveToUrl"
           :accept="'image/*'"
           :on-success="uploadCoverSuccess"
+          :before-upload="uploadPreview"
+          :show-file-list="false"
         >
           <i class="el-icon-upload" style="color:#409EFF"/>
           <div class="el-upload__text text">
@@ -65,14 +67,14 @@
           <div
             slot="tip"
             class="el-upload__tip text"
-          >提示：可支持PNG、JPG、BMP，图片大小不超过4M,长边不大于4096像素，请保证识别的部分为图片的主题部分</div>
+          >提示：可支持PNG,JPG,BMP,JPEG图片大小不超过4M,长宽像素比为5:3左右，请保证识别的部分为图片的主题部分
+          </div>
         </el-upload>
         <!-- 本地预览需要上传处理的图片-->
         <div v-show="isShowImgUpload">
           <div style="position:relative;">
             <el-image
               style="width: 300px; height: 200px"
-              :preview-src-list="[localUrl]"
               :src="localUrl"
               fit="fill"
             />
@@ -242,7 +244,8 @@ export default {
         ]
       },
       contentId: -1,
-      localUrl: ''
+      localUrl: '',
+      isNeedRemovePhoto: false
     }
   },
   created() {
@@ -300,9 +303,15 @@ export default {
       this.isShowUpload = false// 隐藏上传组件
     },
     reUploadButtonClick() {
+      if (this.isNeedRemovePhoto) {
+        const coverName = this.contentVO.cover.substring(this.contentVO.cover.lastIndexOf('/') + 1)
+        // console.log(coverName)
+        contentApi.deleteContentCoverWithName(coverName)
+      }
       this.localUrl = ''
       this.isShowImgUpload = false
       this.isShowUpload = true
+      this.isNeedRemovePhoto = false
     },
     loadData() {
       // 获取路由参数
@@ -371,10 +380,46 @@ export default {
       return previewObject
     },
     uploadCover() {
-      console.log('上传图片')
       this.$refs.upload.submit()
     },
+    uploadPreview(file) {
+      const photoTypeList = ['png', 'jpg', 'jpeg', 'bmp']
+      const photoType = file.name.substring(file.name.lastIndexOf('.') + 1)
+      const isAcceptType = photoTypeList.indexOf(photoType) > -1
+      const isLt4MB = file.size / 1024 / 1024 < 4
+      if (!isAcceptType) {
+        this.$message.error('上传图片必须是指定格式')
+        return false
+      }
+      if (!isLt4MB) {
+        this.$message.error('上传图片大小不能超过 4MB!')
+        return false
+      }
+      const _this = this
+      const is5x3 = new Promise(function (resolve, reject) {
+        const img = new Image()
+        const _URL = window.URL || window.webkitURl
+        img.onload = function () {
+          file.width = img.width// 图片宽度
+          file.height = img.height// 图片高度
+          const valid = img.width / img.height > 1.7 && img.width / img.height < 1.8 // 上传图片尺寸判定
+          valid ? resolve() : reject(new Error('图片尺寸不符合要求'))
+        }
+        img.src = _URL.createObjectURL(file)
+      }).then(
+        () => {
+          return file
+        },
+        () => {
+          _this.$message.error('上传图片尺寸必须接近5比3')
+          return Promise.reject(new Error('error'))
+        }
+      )
+      return isAcceptType && isLt4MB && is5x3
+    },
     uploadCoverSuccess(response) {
+      // 成功上传图片,记录一下标记,重新上传的时候就需要先去删除图片再上传
+      this.isNeedRemovePhoto = true
       this.$message({type: 'success', message: response.message})
       this.contentVO.cover = response.data.url
     },

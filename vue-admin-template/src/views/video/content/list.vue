@@ -39,7 +39,7 @@
       <el-button type="warning" icon="el-icon-search" @click="resetData">清空</el-button>
     </el-form>
     <el-row :gutter="24">
-      <el-col v-for="item in list" :span="4">
+      <el-col v-for="item in list" :span="6">
         <div class="grid-content bg-purple">
           <img :src="item.cover" alt="scope.row.title" width="100%" height="180px">
           <a href="#" style="font-size: 14px; color: #333">{{ item.title }}</a>
