@@ -88,8 +88,12 @@
       </el-dialog>
       <!--      新增小节-->
       <el-dialog
+        v-loading="isLoading"
         title="请输入小节信息"
         :visible.sync="isShowContentVideoForm"
+        element-loading-text="正在上传中"
+        element-loading-spinner="el-icon-loading"
+        element-loading-background="rgba(0, 0, 0, 0.6)"
         width="30%"
       >
         <el-form
@@ -113,30 +117,34 @@
           </el-form-item>
           <el-form-item
             label="上传视频"
-            prop="title"
+            prop="video"
           >
             <!-- 上传视频 -->
             <el-upload
               :on-success="handleVodUploadSuccess"
               :on-remove="handleVodRemove"
               :before-remove="beforeVodRemove"
+              :before-upload="beforeVodUpload"
               :on-exceed="handleUploadExceed"
+              :on-progress="uploadVideoProcess"
               :file-list="fileList"
               :action="BASE_API+'/service_vod/vod/upload'"
               :limit="1"
-              class="upload-demo"
+              class="avatar-uploader"
             >
-              <el-button size="small" type="primary">上传视频</el-button>
-              <el-tooltip placement="right-end">
-                <div slot="content">最大支持1G，<br>
-                  支持3GP、ASF、AVI、DAT、DV、FLV、F4V、<br>
-                  GIF、M2T、M4V、MJ2、MJPEG、MKV、MOV、MP4、<br>
-                  MPE、MPG、MPEG、MTS、OGG、QT、RM、RMVB、<br>
-                  SWF、TS、VOB、WMV、WEBM 等视频格式上传
-                </div>
-                <i class="el-icon-question"/>
-              </el-tooltip>
+              <i class="el-icon-plus avatar-uploader-icon"/>
             </el-upload>
+            <!-- 进度条 -->
+            <el-progress v-if="isShowProgress" :percentage="loadProgress"/>
+            <el-tooltip placement="right-end">
+              <el-button size="small" type="warning">格式要求</el-button>
+              <div slot="content">最大支持1G，<br>
+                支持3GP、ASF、AVI、DAT、DV、FLV、F4V、<br>
+                GIF、M2T、M4V、MJ2、MJPEG、MKV、MOV、MP4、<br>
+                MPE、MPG、MPEG、MTS、OGG、QT、RM、RMVB、<br>
+                SWF、TS、VOB、WMV、WEBM 等视频格式上传
+              </div>
+            </el-tooltip>
           </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
@@ -146,7 +154,11 @@
       </el-dialog>
       <!--      编辑表单-->
       <el-dialog
+        v-loading="isLoading"
         title="编辑信息"
+        element-loading-text="正在上传中"
+        element-loading-spinner="el-icon-loading"
+        element-loading-background="rgba(0, 0, 0, 0.8)"
         :visible.sync="isShowEditForm"
         width="30%"
       >
@@ -166,30 +178,34 @@
           <el-form-item
             v-show="!editFormData.children"
             label="上传视频"
-            prop="title"
+            prop="video"
           >
             <!-- 上传视频 -->
             <el-upload
               :on-success="handleEditVodUploadSuccess"
               :on-remove="handleEditVodRemove"
               :before-remove="beforeVodRemove"
+              :before-upload="beforeVodUpload"
               :on-exceed="handleUploadExceed"
+              :on-progree="uploadVideoProcess"
               :file-list="fileList"
               :action="BASE_API+'/service_vod/vod/upload'"
               :limit="1"
-              class="upload-demo"
+              class="avatar-uploader"
             >
-              <el-button size="small" type="primary">上传视频</el-button>
-              <el-tooltip placement="right-end">
-                <div slot="content">最大支持1G，<br>
-                  支持3GP、ASF、AVI、DAT、DV、FLV、F4V、<br>
-                  GIF、M2T、M4V、MJ2、MJPEG、MKV、MOV、MP4、<br>
-                  MPE、MPG、MPEG、MTS、OGG、QT、RM、RMVB、<br>
-                  SWF、TS、VOB、WMV、WEBM 等视频格式上传
-                </div>
-                <i class="el-icon-question"/>
-              </el-tooltip>
+              <i class="el-icon-plus avatar-uploader-icon"/>
             </el-upload>
+            <!-- 进度条 -->
+            <el-progress v-if="isShowProgress" :percentage="loadProgress"/>
+            <el-tooltip placement="right-end">
+              <el-button size="small" type="warning">格式要求</el-button>
+              <div slot="content">最大支持1G，<br>
+                支持3GP、ASF、AVI、DAT、DV、FLV、F4V、<br>
+                GIF、M2T、M4V、MJ2、MJPEG、MKV、MOV、MP4、<br>
+                MPE、MPG、MPEG、MTS、OGG、QT、RM、RMVB、<br>
+                SWF、TS、VOB、WMV、WEBM 等视频格式上传
+              </div>
+            </el-tooltip>
           </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
@@ -236,6 +252,15 @@ export default {
         callback()
       }
     }
+    var validateVideo = (rule, value, callback) => {
+      console.log(this.fileList)
+      if (this.fileList.length === 0) {
+        callback(new Error('没有上传视频'))
+      }
+      if (this.fileList.length > 0) {
+        callback()
+      }
+    }
     return {
       ruleForm: {
         title: '',
@@ -247,6 +272,9 @@ export default {
         ],
         sort: [
           {validator: validateSort, trigger: 'blur'}
+        ],
+        video: [
+          {validator: validateVideo, trigger: 'blur'}
         ]
       },
       id: 1000,
@@ -277,7 +305,11 @@ export default {
       contentVideoNodeData: {},
       chapterNodeData: {},
       fileList: [], // 上传文件列表
-      BASE_API: process.env.VUE_APP_BASE_API
+      BASE_API: process.env.VUE_APP_BASE_API,
+      isLoading: false,
+      isRejectedType: false, // 判断上传的文件格式是否符合规范
+      loadProgress: 0, // 动态显示进度条
+      isShowProgress: false // 关闭进度条
     }
   },
   created() {
@@ -474,6 +506,8 @@ export default {
     // 上传视频方法
     // 自动上传成功回调
     handleVodUploadSuccess(response, file, fileList) {
+      // 加载标记设为false
+      this.isLoading = false
       // 获取当前上传视频ID
       this.contentVideoFormData.videoSourceId = response.data.videoId
       // 获取当前上传视频标题
@@ -482,6 +516,8 @@ export default {
       this.fileList = [{'name': this.contentVideoFormData.videoOriginalName}]
     },
     handleEditVodUploadSuccess(response, file, fileList) {
+      // 加载标记设为false
+      this.isLoading = false
       // 获取当前上传视频ID
       this.editFormData.videoSourceId = response.data.videoId
       // 获取当前上传视频标题
@@ -495,10 +531,40 @@ export default {
     },
     // 删除之前提示信息
     beforeVodRemove(file, fileList) {
+      if (this.isRejectedType) return
       return this.$confirm(`确定删除 ${file.name}？`)
+    },
+    // 上传之前提示信息
+    beforeVodUpload(file) {
+      this.isLoading = true
+      // 限制文件格式类型
+      const isAcceptType = this.isAcceptType(file)
+      if (!isAcceptType) {
+        this.$message({
+          message: '只能上传指定视频格式',
+          type: 'error'
+        })
+        this.isLoading = false
+        this.isRejectedType = true
+        return false
+      }
+      // 限制文件上传大小
+      const isAcceptSize = this.isAcceptSize(file)
+      if (!isAcceptSize) {
+        this.$message({
+          message: '视频大小超过1G',
+          type: 'error'
+        })
+        this.isLoading = false
+        this.isRejectedType = true
+        return false
+      }
+      // 通过格式检查,就是符合规范的视频
+      this.isRejectedType = false
     },
     // 删除小节视频
     handleVodRemove(file, fileList) {
+      if (this.isRejectedType) return
       vodApi.deleteVodById(this.contentVideoFormData.videoSourceId).then(response => {
         // 清空当前小节视频id
         this.contentVideoFormData.videoSourceId = ''
@@ -512,6 +578,7 @@ export default {
       })
     },
     handleEditVodRemove(file, fileList) {
+      if (this.isRejectedType) return
       vodApi.deleteVodById(this.editFormData.videoSourceId).then(response => {
         // 清空当前小节视频id
         this.editFormData.videoSourceId = ''
@@ -524,18 +591,34 @@ export default {
         })
       })
     },
-    // 回显
-    // editorContentVideo(id) {
-    //   this.dialogVideoFormVisible = true
-    //   videoApi.getVideoInfoById(id).then(res => {
-    //     this.contentVideo = res.data.item
-    //     // 如果有视频, 显示视频标题
-    //     if (this.contentVideo.videoOriginalName !== '') {
-    //       this.fileList = [{ 'name': this.contentVideo.videoOriginalName }]
-    //     }
-    //   })
-    // },
-
+    // 判断选择的文件是否是规定的视频格式
+    isAcceptType(file) {
+      // 限制文件格式类型
+      const fileTypeList = ['3GP', 'ASF', 'AVI', 'DAT', 'DV', 'FLV', 'F4V', 'GIF', 'M2T', 'M4V', 'MJ2', 'MJPEG', 'MKV', 'MOV', 'MP4',
+        'MPE', 'MPG', 'MPEG', 'MTS', 'OGG', 'QT', 'RM', 'RMVB', 'SWF', 'TS', 'VOB', 'WMV', 'WEBM']
+      const fileType = file.name.split('.')[1].toUpperCase()
+      const isAcceptType = fileTypeList.indexOf(fileType) > -1
+      if (isAcceptType) {
+        return true
+      } else {
+        return false
+      }
+    },
+    // 判断选择的文件是否不超过大小限制
+    isAcceptSize(file) {
+      return file.size / 1024 / 1024 / 1024 < 1
+    },
+    // 上传进度
+    uploadVideoProcess(event, file, fileList) {
+      this.isShowProgress = true // 显示进度条
+      this.loadProgress = parseInt(event.percent) // 动态获取文件上传进度
+      if (this.loadProgress >= 100) {
+        this.loadProgress = 100
+        setTimeout(() => {
+          this.isShowProgress = false
+        }, 1000) // 一秒后关闭进度条
+      }
+    },
     pre() {
       this.$router.push({path: '/content/add/' + this.contentId})
     },

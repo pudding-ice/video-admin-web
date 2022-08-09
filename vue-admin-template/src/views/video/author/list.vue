@@ -59,12 +59,17 @@
                       在定义一个编辑的路由
                   -->
           <router-link :to="'/author/edit/'+scope.row.id">
-            <el-button v-if="hasPermission('author.update')" type="primary" size="mini" icon="el-icon-edit">修改
+            <el-button v-if="hasBtnPermission('author.update')" type="primary" size="mini" icon="el-icon-edit">修改
             </el-button>
           </router-link>
           &nbsp;
-          <el-button v-if="hasPermission('author.remove')" type="danger" size="mini" icon="el-icon-delete"
-                     @click="deleteAuthorWithId(scope.row.id)">删除
+          <el-button
+            v-if="hasBtnPermission('author.remove')"
+            type="danger"
+            size="mini"
+            icon="el-icon-delete"
+            @click="deleteAuthorWithId(scope.row.id)"
+          >删除
           </el-button>
         </template>
       </el-table-column>
@@ -84,6 +89,7 @@
 
 <script>
 import author from '@/api/video/author'
+import {hasBtnPermission} from '@/utils/button-control'
 
 export default {
   name: 'List',
@@ -103,6 +109,7 @@ export default {
     this.getAuthorList()
   },
   methods: { // 自定义方法
+    hasBtnPermission,
     getAuthorList(current = 1) {
       this.current = current
       author.getAuthorListPage(this.current, this.size, this.authorQuery)

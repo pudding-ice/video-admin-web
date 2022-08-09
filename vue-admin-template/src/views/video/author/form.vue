@@ -29,8 +29,8 @@
         <image-cropper
           v-show="imageCropperShow"
           :key="cropperKey"
-          :width="500"
-          :height="300"
+          :width="100"
+          :height="100"
           :url="BASE_URL+'/service_upload/file/upload'"
           field="file"
           @close="close"
@@ -53,6 +53,7 @@
 import authorApi from '@/api/video/author'
 import ImageCropper from '@/components/ImageCropper'
 import PanThumb from '@/components/PanThumb'
+
 export default {
   components: { ImageCropper, PanThumb },
   data() {

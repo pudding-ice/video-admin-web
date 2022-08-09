@@ -45,11 +45,11 @@
           <a href="#" style="font-size: 14px; color: #333">{{ item.title }}</a>
           <p style="margin-top: 0px">
             <router-link :to="'/content/add/'+item.id">
-              <el-button v-if="hasPermission('content.update')" type="text" size="mini" icon="el-icon-edit">编辑作品信息
+              <el-button v-if="hasBtnPermission('content.update')" type="text" size="mini" icon="el-icon-edit">编辑作品信息
               </el-button>
             </router-link>
             <el-button
-              v-if="hasPermission('content.remove')"
+              v-if="hasBtnPermission('content.remove')"
               style="margin-left: 10px"
               type="text"
               size="mini"
@@ -79,6 +79,7 @@
 <script>
 import categoryApi from '@/api/video/category'
 import contentApi from '@/api/video/content'
+import {hasBtnPermission} from '@/utils/button-control'
 
 export default {
   data() {
@@ -103,6 +104,7 @@ export default {
     this.getData(1)
   },
   methods: {
+    hasBtnPermission,
     // 加载所有的分类
     getCategoryTree() {
       categoryApi.getCategoryTree().then((response) => {
