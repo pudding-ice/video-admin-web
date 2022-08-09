@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+
 export default {
   getAuthorListPage(curent, size, authorQuery) {
     return request({
@@ -35,6 +36,12 @@ export default {
       url: `/service_video/author/update`,
       method: 'post',
       data: author
+    })
+  },
+  deleteAuthorAvatarWithName(avatarName) {
+    return request({
+      url: `/service_video/author/deleteAuthorAvatarWithName/${avatarName}`,
+      method: 'delete'
     })
   }
 }
