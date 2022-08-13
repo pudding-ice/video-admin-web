@@ -58,6 +58,8 @@
           :on-success="uploadCoverSuccess"
           :before-upload="uploadPreview"
           :show-file-list="false"
+          :file-list="coverFileList"
+          :limit="1"
         >
           <i class="el-icon-upload" style="color:#409EFF"/>
           <div class="el-upload__text text">
@@ -245,7 +247,8 @@ export default {
       },
       contentId: -1,
       localUrl: '',
-      isNeedRemovePhoto: false
+      isNeedRemovePhoto: false,
+      coverFileList: []
     }
   },
   created() {
@@ -303,12 +306,14 @@ export default {
       this.isShowUpload = false// 隐藏上传组件
     },
     reUploadButtonClick() {
+      console.log(this.coverFileList)
       if (this.isNeedRemovePhoto) {
         const coverName = this.contentVO.cover.substring(this.contentVO.cover.lastIndexOf('/') + 1)
         // console.log(coverName)
         contentApi.deleteContentCoverWithName(coverName)
       }
       this.localUrl = ''
+      this.coverFileList = []
       this.isShowImgUpload = false
       this.isShowUpload = true
       this.isNeedRemovePhoto = false
@@ -402,7 +407,9 @@ export default {
         img.onload = function () {
           file.width = img.width// 图片宽度
           file.height = img.height// 图片高度
-          const valid = img.width / img.height > 1.7 && img.width / img.height < 1.8 // 上传图片尺寸判定
+          const widDevHeight = img.width / img.height
+          console.log(widDevHeight);
+          const valid = widDevHeight > 1.6 && widDevHeight < 1.7 // 上传图片尺寸判定
           valid ? resolve() : reject(new Error('图片尺寸不符合要求'))
         }
         img.src = _URL.createObjectURL(file)

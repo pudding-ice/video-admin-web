@@ -152,14 +152,14 @@
           <el-button type="primary" @click="addContentVideo('contentVideoFormData')">确 定</el-button>
         </span>
       </el-dialog>
-      <!--      编辑表单-->
+      <!--      编辑小节表单-->
       <el-dialog
         v-loading="isLoading"
         title="编辑信息"
         element-loading-text="正在上传中"
         element-loading-spinner="el-icon-loading"
         element-loading-background="rgba(0, 0, 0, 0.8)"
-        :visible.sync="isShowEditForm"
+        :visible.sync="isShowEditVideoForm"
         width="30%"
       >
         <el-form ref="editFormData" label-width="100px" :rules="rules" :model="editFormData" class="demo-ruleForm">
@@ -193,7 +193,7 @@
               :limit="1"
               class="avatar-uploader"
             >
-              <i class="el-icon-plus avatar-uploader-icon"/>
+              <i size="small" class="el-icon-plus avatar-uploader-icon"/>
             </el-upload>
             <!-- 进度条 -->
             <el-progress v-if="isShowProgress" :percentage="loadProgress"/>
@@ -213,7 +213,33 @@
           <el-button type="primary" @click="addEdit('editFormData')">确 定</el-button>
         </span>
       </el-dialog>
-
+      <!--      编辑章节表单-->
+      <el-dialog
+        title="编辑章节信息"
+        :visible.sync="isShowEditChapterForm"
+        width="30%"
+        :before-close="closeEditChapterForm"
+      >
+        <el-form ref="editChapterFormData" label-width="100px" :rules="rules" :model="chapterFormData"
+                 class="demo-ruleForm">
+          <el-form-item
+            label="名称"
+            prop="title"
+          >
+            <el-input v-model="chapterFormData.title"/>
+          </el-form-item>
+          <el-form-item
+            label="排序"
+            prop="sort"
+          >
+            <el-input v-model.number="chapterFormData.sort"/>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="closeEditChapterForm">取 消</el-button>
+          <el-button type="primary" @click="updateChapterForm('editChapterFormData')">确 定</el-button>
+        </span>
+      </el-dialog>
     </div>
 
   </div>
@@ -253,7 +279,6 @@ export default {
       }
     }
     var validateVideo = (rule, value, callback) => {
-      console.log(this.fileList)
       if (this.fileList.length === 0) {
         callback(new Error('没有上传视频'))
       }
@@ -294,7 +319,8 @@ export default {
         videoSourceId: null,
         videoOriginalName: null
       },
-      isShowEditForm: false,
+      isShowEditVideoForm: false,
+      isShowEditChapterForm: false,
       editFormData: {
         title: '',
         sort: '',
@@ -331,6 +357,23 @@ export default {
     closeChapterForm() {
       this.resetChapterForm()
       this.isShowChapterForm = false
+    },
+    closeEditChapterForm() {
+      this.chapterFormData.title = ''
+      this.chapterFormData.sort = ''
+      this.isShowEditChapterForm = false
+    },
+    updateChapterForm(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          const data = this.chapterFormData
+          this.chapterNodeData.title = data.title
+          this.chapterNodeData.sort = data.sort
+          this.closeEditChapterForm()
+        } else {
+          return false
+        }
+      })
     },
     addChapter(formName) {
       this.$refs[formName].validate((valid) => {
@@ -389,6 +432,7 @@ export default {
       this.fileList = []
     },
     appendContentVideo(data) {
+      this.resetContentVideoForm()
       this.contentVideoNodeData = data
       this.isShowContentVideoForm = true
     },
@@ -404,32 +448,22 @@ export default {
     },
 
     closeEditForm() {
-      this.isShowEditForm = false
+      this.isShowEditVideoForm = false
       this.editFormData = {}
     },
     addEdit(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          console.log(this.editFormData)
-          if (this.editFormData.children != null) {
-            // 父节点
-            console.log('父节点修改')
-            const data = this.chapterNodeData
-            data.sort = this.editFormData.sort
-            data.title = this.editFormData.title
-          } else {
-            console.log('子节点修改')
-            const data = this.contentVideoNodeData
-            console.log(data)
-            data.sort = this.editFormData.sort
-            data.title = this.editFormData.title
-          }
+          const data = this.contentVideoNodeData
+          data.sort = this.editFormData.sort
+          data.title = this.editFormData.title
           this.closeEditForm()
           this.$message({
             type: 'success',
             message: '编辑成功'
           })
         } else {
+          console.log('编辑失败')
           return false
         }
       })
@@ -437,20 +471,21 @@ export default {
     edit(node, data) {
       console.log(data)
       if (data.children != null) {
-        // 父结点,有孩子
+        // 父结点,有孩子,编辑章节
         this.chapterNodeData = data
-        this.editFormData.children = []
-        this.editFormData = data
+        this.chapterFormData = {...data}
+        this.isShowEditChapterForm = true
       } else {
+        // 没有孩子,编辑小节
         this.contentVideoNodeData = data
-        this.editFormData = data
+        this.editFormData = {...data}
+        if (data.videoSourceId != null && data.videoSourceId !== '') {
+          this.editFormData.videoOriginalName = data.videoOriginalName
+          this.editFormData.videoSourceId = data.videoSourceId
+          this.fileList = [{'name': this.editFormData.videoOriginalName}]
+        }
+        this.isShowEditVideoForm = true
       }
-      if (data.videoSourceId != null && data.videoSourceId !== undefined && data.videoSourceId !== '') {
-        this.editFormData.videoOriginalName = data.videoOriginalName
-        this.editFormData.videoSourceId = data.videoSourceId
-        this.fileList = [{'name': this.editFormData.videoOriginalName}]
-      }
-      this.isShowEditForm = true
     },
 
     remove(node, data) {

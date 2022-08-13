@@ -89,7 +89,7 @@ export default {
       list: null, // 数据列表
       total: 0, // 总记录数
       current: 1, // 页码
-      size: 10, // 每页记录数
+      size: 8, // 每页记录数
       contentQuery: {
         categoryId: null,
         title: null,
@@ -172,7 +172,7 @@ export default {
   border-radius: 4px;
   min-height: 36px;
   height: 250px;
-
+  margin-top: 10px;
 }
 
 .row-bg {

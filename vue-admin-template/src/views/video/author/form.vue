@@ -22,16 +22,22 @@
         <el-upload
           ref="avatar"
           class="avatar-uploader"
+          accept="image/*"
           :action="BASE_URL+'/service_upload/file/uploadAvatar'"
           :show-file-list="false"
           :on-success="handleAvatarSuccess"
           :before-upload="beforeAvatarUpload"
           :on-change="imgSaveToUrl"
           :auto-upload="false"
+          :limit="1"
+          :file-list="avatarList"
         >
           <img v-if="localUrl" :src="localUrl" class="avatar">
           <i v-else class="el-icon-plus avatar-uploader-icon"/>
         </el-upload>
+        <el-button type="warning" size="small" style="margin-top: 10px;margin-bottom: 10px;" @click="reChooseAvatar">
+          重新选择
+        </el-button>
         <el-button type="success" size="small" style="margin-top: 10px;margin-bottom: 10px;" @click="uploadAvatar">
           确认上传
         </el-button>
@@ -114,7 +120,9 @@ export default {
       // imageCropperShow: false,
       // cropperKey: 0,
       BASE_URL: process.env.VUE_APP_BASE_API,
-      isNeedRemoveAvatar: false
+      isNeedRemoveAvatar: false,
+      avatarList: [],
+      allowUploadAvatar: false
     }
   },
   created() { // 一进来就要获取参数
@@ -186,11 +194,17 @@ export default {
         this.$message.error(res.message)
       }
     },
+    reChooseAvatar() {
+      this.avatarList = []
+      this.localUrl = ''
+    },
     beforeAvatarUpload(file) {
+      // 判断是否要删除之前的图片
       if (this.isNeedRemoveAvatar) {
         const avatarName = this.author.avatar.substring(this.author.avatar.lastIndexOf('/') + 1)
         authorApi.deleteAuthorAvatarWithName(avatarName)
         this.author.avatar = ''
+        this.isNeedRemoveAvatar = false
       }
       const isLt2M = file.size / 1024 / 1024 < 2
       const photoTypeList = ['png', 'jpg', 'jpeg', 'bmp']
@@ -204,24 +218,29 @@ export default {
       }
       return isAcceptType && isLt2M
     },
-    imgSaveToUrl(event) {
+    imgSaveToUrl(file, fileList) {
+      console.log(fileList)
       // 获取上传图片的本地URL，用于上传前的本地预览
       var URL = null
       if (window.createObjectURL !== undefined) {
         // basic
-        URL = window.createObjectURL(event.raw)
+        URL = window.createObjectURL(file.raw)
       } else if (window.URL !== undefined) {
         // mozilla(firefox)
-        URL = window.URL.createObjectURL(event.raw)
+        URL = window.URL.createObjectURL(file.raw)
       } else if (window.webkitURL !== undefined) {
         // webkit or chrome
-        URL = window.webkitURL.createObjectURL(event.raw)
+        URL = window.webkitURL.createObjectURL(file.raw)
       }
       // 转换后的地址为 blob:http://xxx/7bf54338-74bb-47b9-9a7f-7a7093c716b5
       this.localUrl = URL
     },
     uploadAvatar() {
-      this.$refs.avatar.submit()
+      if (this.localUrl === '') {
+        this.$message({type: 'warning', message: '至少选择一张照片'})
+      } else {
+        this.$refs.avatar.submit()
+      }
     }
     // close() {
     //   this.imageCropperShow = false
