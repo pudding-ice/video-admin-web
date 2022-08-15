@@ -37,7 +37,6 @@ router.beforeEach(async (to, from, next) => {
           // get user info
           await store.dispatch('user/getInfo')
           await store.dispatch('user/getRouter') // 触发获取路由表的接口
-          console.log(store.getters.menus.length)
           if (store.getters.menus.length < 1) {
             global.antRouter = []
             next()

@@ -220,8 +220,13 @@
         width="30%"
         :before-close="closeEditChapterForm"
       >
-        <el-form ref="editChapterFormData" label-width="100px" :rules="rules" :model="chapterFormData"
-                 class="demo-ruleForm">
+        <el-form
+          ref="editChapterFormData"
+          label-width="100px"
+          :rules="rules"
+          :model="chapterFormData"
+          class="demo-ruleForm"
+        >
           <el-form-item
             label="名称"
             prop="title"

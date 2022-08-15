@@ -14,12 +14,12 @@
       :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
       @row-click="clickTable"
     >
-      <el-table-column prop="name" label="名称" sortable width="180"/>
-      <el-table-column prop="path" label="访问路径" sortable width="180"/>
-      <el-table-column prop="component" label="组件路径" sortable width="180"/>
-      <el-table-column prop="permissionValue" label="权限值"/>
+      <el-table-column prop="name" label="名称" sortable min-width="15%"/>
+      <el-table-column prop="path" label="访问路径" sortable min-width="15%"/>
+      <el-table-column prop="component" label="组件路径" sortable min-width="15%"/>
+      <el-table-column prop="permissionValue" label="权限值" min-width="15%"/>
       <!--CRUD操作-->
-      <el-table-column label="操作">
+      <el-table-column label="操作" min-width="40%">
         <template slot-scope="scope">
           <el-button
             type="primary"
