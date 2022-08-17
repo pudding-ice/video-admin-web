@@ -3,7 +3,7 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
       <div class="title-container">
         <img class="logo_img" src="@/assets/login_images/logo.png" alt="" />
-        <h3 class="title">至诚视频后台管理</h3>
+        <h3 class="title">后台管理</h3>
       </div>
 
       <el-form-item prop="username">
@@ -60,8 +60,8 @@ export default {
     }
     return {
       loginForm: {
-        username: 'guochun',
-        password: '123456'
+        username: '',
+        password: ''
       },
       loginRules: {
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]

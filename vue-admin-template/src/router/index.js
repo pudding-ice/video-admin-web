@@ -51,7 +51,8 @@ const createRouter = () => new Router({
   mode: 'hash',
   // mode: 'history', // require service support
   scrollBehavior: () => ({y: 0}),
-  routes: constantRoutes
+  routes: constantRoutes,
+  base: '/admin'
 })
 
 const router = createRouter()
