@@ -3,7 +3,7 @@
     <!--查询表单-->
     <el-form :inline="true" class="demo-form-inline">
       <el-form-item>
-        <el-input v-model="searchObj.roleName" placeholder="角色名称"/>
+        <el-input v-model="searchObj.roleName" placeholder="角色名称" />
       </el-form-item>
       <el-button type="primary" icon="el-icon-search" @click="fetchData()">查询</el-button>
       <el-button type="default" @click="resetData()">清空</el-button>
@@ -11,8 +11,8 @@
 
     <!-- 工具条 -->
     <div>
-      <el-button v-if="hasPermission('role.add')" type="primary" size="mini" @click="addUser()">添加</el-button>
-      <el-button v-if="hasPermission('role.remove')" type="danger" size="mini" @click="removeRows()">批量删除</el-button>
+      <el-button v-if="hasBtnPermission('role.add')" type="primary" size="mini" @click="addUser()">添加</el-button>
+      <el-button v-if="hasBtnPermission('role.remove')" type="danger" size="mini" @click="removeRows()">批量删除</el-button>
     </div>
     <!-- 角色列表 -->
     <el-table
@@ -38,20 +38,25 @@
         </template>
       </el-table-column>
 
-      <el-table-column prop="roleName" label="角色名称"/>
+      <el-table-column prop="roleName" label="角色名称" />
 
       <el-table-column label="操作" width="300" align="center">
         <template slot-scope="scope">
           <router-link :to="'/authority/role/distribution/'+scope.row.id">
-            <el-button v-if="hasPermission('role.acl')" type="success" size="mini" style="margin-right:5px">分配权限
+            <el-button v-if="hasBtnPermission('role.acl')" type="success" size="mini" style="margin-right:5px">分配权限
             </el-button>
           </router-link>
           <router-link :to="'/authority/role/update/'+scope.row.id">
-            <el-button v-if="hasPermission('role.update')" type="primary" size="mini" style="margin-right:5px">编辑
+            <el-button v-if="hasBtnPermission('role.update')" type="primary" size="mini" style="margin-right:5px">编辑
             </el-button>
           </router-link>
-          <el-button v-if="hasPermission('role.remove')" type="danger" size="mini" @click="removeDataById(scope.row.id)"
-                     style="margin-right:5px">删除
+          <el-button
+            v-if="hasBtnPermission('role.remove')"
+            type="danger"
+            size="mini"
+            style="margin-right:5px"
+            @click="removeDataById(scope.row.id)"
+          >删除
           </el-button>
         </template>
       </el-table-column>
@@ -73,6 +78,7 @@
 
 <script>
 import roleApi from '@/api/authority/role'
+import {hasBtnPermission} from '@/utils/button-control'
 
 export default {
   data() {
@@ -99,6 +105,7 @@ export default {
   },
 
   methods: {
+    hasBtnPermission,
     // 当页码发生改变的时候
     changeSize(size) {
       console.log(size)
@@ -107,7 +114,7 @@ export default {
     },
 
     addUser() {
-      this.$router.push({path: '/authority/role/form'})
+      this.$router.push({ path: '/authority/role/form' })
     },
 
     // 加载讲师列表数据

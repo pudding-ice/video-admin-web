@@ -85,7 +85,6 @@ function filterAsyncRouter(asyncRouterMap) {
           route.component = _import(route.component) // 导入组件
         } catch (error) {
           console.log(error)
-          route.component = _import('dashboard/index') // 导入组件
         }
       }
     }

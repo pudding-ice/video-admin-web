@@ -14,38 +14,43 @@
       :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
       @row-click="clickTable"
     >
-      <el-table-column prop="name" label="名称" sortable min-width="15%"/>
-      <el-table-column prop="path" label="访问路径" sortable min-width="15%"/>
-      <el-table-column prop="component" label="组件路径" sortable min-width="15%"/>
-      <el-table-column prop="permissionValue" label="权限值" min-width="15%"/>
+      <el-table-column prop="name" label="名称" sortable min-width="15%" />
+      <el-table-column prop="path" label="访问路径" sortable min-width="15%" />
+      <el-table-column prop="component" label="组件路径" sortable min-width="15%" />
+      <el-table-column prop="permissionValue" label="权限值" min-width="15%" />
       <!--CRUD操作-->
       <el-table-column label="操作" min-width="40%">
         <template slot-scope="scope">
           <el-button
+            v-if="hasBtnPermission('menu.add')"
             type="primary"
             size="mini"
             @click.native.stop="() => {dialogFormVisible = true,menu.pid = scope.row.id}"
           >添加菜单
           </el-button>
           <el-button
+            v-if="hasBtnPermission('menu.update')"
             type="success"
             size="mini"
             @click.native.stop="() => getById(scope.row)"
           >修改菜单
           </el-button>
           <el-button
+            v-if="hasBtnPermission('menu.add')"
             type="success"
             size="mini"
             @click.native.stop="() => {dialogPermissionVisible = true, permission.pid = scope.row.id}"
           >添加权限
           </el-button>
           <el-button
+            v-if="hasBtnPermission('menu.update')"
             type="primary"
             size="mini"
             @click.native.stop="() => updateFunction(scope.row)"
           >修改权限
           </el-button>
           <el-button
+            v-if="hasBtnPermission('menu.remove')"
             type="danger"
             size="mini"
             icon="el-icon-delete"
@@ -58,13 +63,13 @@
     <el-dialog :visible.sync="dialogFormVisible" :title="dialogFormValue">
       <el-form ref="menu" :model="menu" :rules="menuValidateRules" label-width="120px">
         <el-form-item label="菜单名称" prop="name">
-          <el-input v-model="menu.name"/>
+          <el-input v-model="menu.name" />
         </el-form-item>
         <el-form-item label="访问路径" prop="path">
-          <el-input v-model="menu.path"/>
+          <el-input v-model="menu.path" />
         </el-form-item>
         <el-form-item label="组件路径" prop="component">
-          <el-input v-model="menu.component"/>
+          <el-input v-model="menu.component" />
         </el-form-item>
 
       </el-form>
@@ -77,16 +82,16 @@
     <el-dialog :visible.sync="dialogPermissionVisible" title="添加功能权限">
       <el-form ref="permission" :model="permission" :rules="permissionValidateRules" label-width="120px">
         <el-form-item label="功能名称" prop="name">
-          <el-input v-model="permission.name"/>
+          <el-input v-model="permission.name" />
         </el-form-item>
         <el-form-item label="访问路径">
-          <el-input v-model="permission.path"/>
+          <el-input v-model="permission.path" />
         </el-form-item>
         <el-form-item label="组件路径">
-          <el-input v-model="permission.component"/>
+          <el-input v-model="permission.component" />
         </el-form-item>
         <el-form-item label="功能权限值" prop="permissionValue">
-          <el-input v-model="permission.permissionValue"/>
+          <el-input v-model="permission.permissionValue" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -100,6 +105,7 @@
 
 <script>
 import menu from '@/api/authority/menu'
+import { hasBtnPermission } from '@/utils/button-control'
 
 /** 菜单实体*/
 const menuForm = {
@@ -130,16 +136,16 @@ export default {
       dialogFormValue: '添加菜单',
       dialogFormVisible: false,
       dialogPermissionVisible: false,
-      menu: {...menuForm},
-      permission: {...perForm},
+      menu: { ...menuForm },
+      permission: { ...perForm },
       menuValidateRules: {
-        name: [{required: true, trigger: 'blur', message: '菜单名必须输入'}],
-        path: [{required: true, trigger: 'blur', message: '菜单路径必须输入'}],
-        component: [{required: true, trigger: 'blur', message: '组件名称必须输入'}]
+        name: [{ required: true, trigger: 'blur', message: '菜单名必须输入' }],
+        path: [{ required: true, trigger: 'blur', message: '菜单路径必须输入' }],
+        component: [{ required: true, trigger: 'blur', message: '组件名称必须输入' }]
       },
       permissionValidateRules: {
-        name: [{required: true, trigger: 'blur', message: '功能名称必须输入'}],
-        permissionValue: [{required: true, trigger: 'blur', message: '功能权限值必须输入'}]
+        name: [{ required: true, trigger: 'blur', message: '功能名称必须输入' }],
+        permissionValue: [{ required: true, trigger: 'blur', message: '功能权限值必须输入' }]
       },
       // 要展开的行，数值的元素是row的key值
       expands: []
@@ -150,6 +156,7 @@ export default {
     this.fetchNodeList()
   },
   methods: {
+    hasBtnPermission,
     /** table的方法,展开/折叠 行*/
     clickTable(row, index, e) {
       // 调用,table的方法,展开/折叠 行
@@ -283,8 +290,8 @@ export default {
     resetData() {
       this.dialogPermissionVisible = false
       this.dialogFormVisible = false
-      this.menu = {...menuForm}
-      this.permission = {...perForm}
+      this.menu = { ...menuForm }
+      this.permission = { ...perForm }
     }
   }
 }

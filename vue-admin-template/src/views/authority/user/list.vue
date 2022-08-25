@@ -3,15 +3,15 @@
     <!--查询表单-->
     <el-form :inline="true" class="demo-form-inline">
       <el-form-item>
-        <el-input v-model="searchObj.username" placeholder="用户名"/>
+        <el-input v-model="searchObj.username" placeholder="用户名" />
       </el-form-item>
       <el-button type="primary" icon="el-icon-search" @click="fetchData()">查询</el-button>
       <el-button type="default" @click="resetData()">清空</el-button>
     </el-form>
     <!-- 工具条 -->
     <div>
-      <el-button v-if="hasPermission('user.add')" type="primary" size="mini" @click="addUser()">添加</el-button>
-      <el-button v-if="hasPermission('user.remove')" type="danger" size="mini" @click="removeRows()">批量删除</el-button>
+      <el-button v-if="hasBtnPermission('user.add')" type="primary" size="mini" @click="addUser()">添加</el-button>
+      <el-button v-if="hasBtnPermission('user.remove')" type="danger" size="mini" @click="removeRows()">批量删除</el-button>
     </div>
     <!--用户列表 -->
     <el-table
@@ -34,21 +34,25 @@
           {{ (page - 1) * limit + scope.$index + 1 }}
         </template>
       </el-table-column>
-      <el-table-column prop="username" label="用户名" width="150"/>
-      <el-table-column prop="nickName" label="用户昵称"/>
-      <el-table-column prop="gmtCreate" label="创建时间" width="180"/>
+      <el-table-column prop="username" label="用户名" width="150" />
+      <el-table-column prop="nickName" label="用户昵称" />
+      <el-table-column prop="gmtCreate" label="创建时间" width="180" />
       <el-table-column label="操作" width="250" align="center">
         <template slot-scope="scope">
           <router-link :to="'/authority/user/role/'+scope.row.id">
-            <el-button v-if="hasPermission('user.assgin')" type="success" size="mini">绑定角色</el-button>
+            <el-button v-if="hasBtnPermission('user.assgin')" type="success" size="mini">绑定角色</el-button>
           </router-link>
           &nbsp;
           <router-link :to="'/authority/user/update/'+scope.row.id">
-            <el-button v-if="hasPermission('user.update')" type="primary" size="mini">修改</el-button>
+            <el-button v-if="hasBtnPermission('user.update')" type="primary" size="mini">修改</el-button>
           </router-link>
           &nbsp;
-          <el-button v-if="hasPermission('user.remove')" type="danger" size="mini"
-                     @click="removeDataById(scope.row.id)">删除
+          <el-button
+            v-if="hasBtnPermission('user.remove')"
+            type="danger"
+            size="mini"
+            @click="removeDataById(scope.row.id)"
+          >删除
           </el-button>
         </template>
       </el-table-column>
@@ -69,6 +73,7 @@
 </template>
 <script>
 import user from '@/api/authority/user'
+import { hasBtnPermission } from '@/utils/button-control'
 
 export default {
   data() {
@@ -87,6 +92,7 @@ export default {
     this.fetchData()
   },
   methods: {
+    hasBtnPermission,
     /** 当页码发生改变的时候*/
     changeSize(size) {
       console.log(size)
@@ -95,7 +101,7 @@ export default {
     },
     addUser() {
       /** 添加用户,跳转到添加路由*/
-      this.$router.push({path: '/authority/user/add'})
+      this.$router.push({ path: '/authority/user/add' })
     },
 
     /** 加载用户数据*/
